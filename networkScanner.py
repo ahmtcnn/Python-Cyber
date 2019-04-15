@@ -1,8 +1,9 @@
 import scapy.all as scapy
 import optparse
-# import argparse -> new
+# import argparse for python3
 
 
+# Getting arguments from user
 def getArgs():
     parser = optparse.OptionParser()
     parser.add_option("-t", "--target", dest="target", help="Ip target to scan through network")
@@ -13,6 +14,7 @@ def getArgs():
     return options
 
 
+# Creating broadcast frame for Arp and getting answers
 def scan(ip):
     arpRequest = scapy.ARP(pdst=ip)
     broadcast = scapy.Ether(dst="ff:ff:ff:ff:ff:ff")
@@ -24,7 +26,7 @@ def scan(ip):
     return answeredList
 
 
-
+# Parsing results for user interface
 def parsePrintList(answeredList):
 
     clientsList = []
@@ -38,23 +40,7 @@ def parsePrintList(answeredList):
         print(clients["ip"] + "\t\t" + clients["mac"])
 
 
-#option = getArgs()
-answerList = scan("10.30.162.0/24")
+option = getArgs()
+answerList = scan(option.target)
 parsePrintList(answerList)
 
-
-
-
-
-# scapy.ls(scapy.ARP)
-# arpRequestBroadcast.show()
-# print(element[1].show())
-# print(element[1].psrc + " \t\t " + element[1].hwsrc)
-
-# scapy.srp
-# this method send and receive packets
-# it returns couple of two lists
-# the first is a list of couples(packet sent,answer)
-# the second is the list of unanswered packets.
-# if you don't set the timeout you'll stuck in there
-# print(answered.summary())
