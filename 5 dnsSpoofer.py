@@ -13,6 +13,7 @@ def processPacket(packet):
             myScapyPacket[scapy.DNS].an = answer
             myScapyPacket[scapy.DNS].ancount =  1
             
+            # We have to delete length and checksum field. When the packet send it calculate and filss the deleted parts
             del myScapyPacket[scapy.IP].len
             del myScapyPacket[scapy.IP].chksum
             del myScapyPacket[scapy.UDP].chksum
