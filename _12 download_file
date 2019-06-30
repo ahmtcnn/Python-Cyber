@@ -1,0 +1,14 @@
+import requests # this allows us to send request to internet
+
+
+def download(url):
+    get_response = requests.get(url) # get function
+                                   # it sends a get request for you to url and it returns the result.
+    print(get_response.content)
+    file_name = url.split("/")[-1]  # the last elemet of the list
+
+    with open(file_name, "wb") as out_file: # we are saying that it is a binary file with 'b'
+         out_file.write(get_response.content)
+
+
+download("https://www.carmagazine.co.uk/Images/PageFiles/69400/GTRNismo_13.jpg")
