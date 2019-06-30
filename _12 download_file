@@ -1,5 +1,16 @@
 import requests # this allows us to send request to internet
+import optparse
 
+
+def getArguments():
+
+    parser = optparse.OptionParser()
+    parser.add_option("-t","--target",dest="target",help="Target domain to download file")
+    (options,arguments) = parser.parse_args()
+    if not options.target:
+        #Code to handle error
+        parser.error("[-] Please specify a target, use --help for more info")
+    return options
 
 def download(url):
     get_response = requests.get(url) # get function
@@ -10,5 +21,6 @@ def download(url):
     with open(file_name, "wb") as out_file: # we are saying that it is a binary file with 'b'
          out_file.write(get_response.content)
 
+option = getArguments()
 
-download("https://www.carmagazine.co.uk/Images/PageFiles/69400/GTRNismo_13.jpg")
+download(option.target)
