@@ -1,0 +1,44 @@
+import requests
+import optparse
+
+
+def getArguments():
+
+    parser = optparse.OptionParser()
+    parser.add_option("-t","--target",dest="target",help="target for subdomain search")
+    parser.add_option("-w","--wordlist",dest="wordlist",help="Specify a wordlist if you want")
+    (options,arguments) = parser.parse_args()
+    if not options.target:
+        # Code to handle error
+        parser.error("[-] Please specify your target use --help for more info")
+    return options
+
+
+def request(url):
+    try:
+        return requests.get("http://" + url, timeout=6)
+    except requests.exceptions.ConnectionError:
+        pass
+    except Exception:
+        pass
+
+
+options = getArguments()
+target_url = options.target
+wordlist = "subdomains-wodlist.txt"
+
+if(options.wordlist):
+    wordlist = options.wordlist
+
+# This is for subdomains
+with open(wordlist, "r") as file:
+    for line in file:
+        word = line.strip()
+        test_url = word + "." + target_url
+        response = request(test_url)
+        if response:
+            print("[+] Discovered subdomain -> " + test_url)
+        if not response:
+            pass
+
+
