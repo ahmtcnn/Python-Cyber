@@ -1,0 +1,15 @@
+import scanner
+
+target_url = "http://10.30.161.122/dvwa/"
+links_to_ignore = ["http://10.30.161.122/dvwa/logout.php"]
+data_dict = {"username":"admin", "password":"password", "Login":"submit"}
+
+
+
+# burada login oluyoruz ancak kendini kapatiyor hemen
+
+vuln_scanner = scanner.Scanner(target_url, links_to_ignore)
+vuln_scanner.session.post("http://10.30.161.122/dvwa/login.php", data=data_dict)
+#print(response.content)
+vuln_scanner.crawl()
+vuln_scanner.run_scanner()
