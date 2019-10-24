@@ -1,0 +1,34 @@
+	if (FireEnemyMissile)
+	{
+		EnemyBarrelDirection = XMVectorSet(0.f, 0.f, 1.0f, 0.f);
+		XMVECTOR initialPosition = EnemyBarrelDirection * (2.5);		// Namlunun ucu Tankýn merkezinden 2.5 birim ileride
+		XMFLOAT4 initialPosition_F4;
+		XMStoreFloat4(&initialPosition_F4, initialPosition);
+		g_World_Enemy_Missile = g_World_Enemy;
+		XMStoreFloat4x4(&g_World_Enemy_Missile_4x4, g_World_Enemy_Missile);
+		g_World_Enemy_Missile_4x4._41 += initialPosition_F4.x;
+		g_World_Enemy_Missile_4x4._42 += initialPosition_F4.y + 1.0f;
+		g_World_Enemy_Missile_4x4._43 += initialPosition_F4.z;
+		g_World_Enemy_Missile = XMLoadFloat4x4(&g_World_Enemy_Missile_4x4);
+	
+		Ro_Enemy_Missile = XMVectorSet(g_World_Enemy_Missile_4x4._41, g_World_Enemy_Missile_4x4._42, g_World_Enemy_Missile_4x4._43, 0);
+	
+	}
+
+	XMFLOAT4   Rd_Enemy_Missile_Float4; XMStoreFloat4(&Rd_Enemy_Missile_Float4, Rd_Enemy_Missile);
+
+	if (TraceEnemyMissile)
+	{
+
+
+		XMFLOAT4 Tank_Position_Float4;
+		Tank_Position_Float4.y = 1;
+
+		Rd_Enemy_Missile = XMVector3Normalize(XMVectorSubtract(Tank_Position, Ro_Enemy_Missile));
+		XMFLOAT4 Rd_Enemy_Missile_Float4;
+		XMStoreFloat4(&Rd_Enemy_Missile_Float4, Rd_Enemy_Missile);
+
+		g_World_Enemy_Missile_4x4._41 += 0.3 * Rd_Enemy_Missile_Float4.x;
+		g_World_Enemy_Missile_4x4._42 += 0.3 * Rd_Enemy_Missile_Float4.y;
+		g_World_Enemy_Missile_4x4._43 += 0.3 * Rd_Enemy_Missile_Float4.z;
+		g_World_Enemy_Missile = XMLoadFloat4x4(&g_World_Enemy_Missile_4x4);
